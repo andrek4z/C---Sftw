@@ -1,99 +1,110 @@
 #include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
 #include <list>
 
-using namespace std;
-
-// Function to calculate the factorial of a number
-int factorial(int n) 
+class HangmanGame 
 {
-    if (n == 0)
-        return 1;
-    else
-        return n * factorial(n - 1);
-}
+private:
+    std::string secretWord;
+    std::string guessedWord;
+    int maxAttempts;
+    int remainingAttempts;
+    std::list<char> guessedLetters;
 
-// Class to represent a student
-class Student 
-{
-    private:
-        string name;
-        int age;
+public:
+    HangmanGame(const std::string& word, int attempts) : secretWord(word), maxAttempts(attempts), remainingAttempts(attempts) 
+    {
+        guessedWord = std::string(secretWord.length(), '_');
+    }
 
-    public:
-        Student(string n, int a) : name(n), age(a) {}
-
-        void display() 
+    void play() {
+        while (remainingAttempts > 0 && guessedWord != secretWord) 
         {
-            cout << "Name: " << name << ", Age: " << age << endl;
+            displayStatus();
+            char guess = getGuess();
+            updateGuessedWord(guess);
+            if (secretWord.find(guess) == std::string::npos) 
+            {
+                remainingAttempts--;
+                std::cout << "Incorrect guess! " << remainingAttempts << " attempts left.\n";
+            }
         }
+
+        if (guessedWord == secretWord) 
+        {
+            std::cout << "Congratulations! You guessed the word: " << secretWord << std::endl;
+        } else 
+        {
+            std::cout << "Out of attempts! The word was: " << secretWord << std::endl;
+        }
+    }
+
+private:
+    void displayStatus() 
+    {
+        std::cout << "Guessed word: " << guessedWord << std::endl;
+        std::cout << "Guessed letters: ";
+        for (char letter : guessedLetters) 
+        {
+            std::cout << letter << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    char getGuess() 
+    {
+        char guess;
+        std::cout << "Enter your guess: ";
+        std::cin >> guess;
+        guessedLetters.push_back(guess);
+        return guess;
+    }
+
+    void updateGuessedWord(char guess) 
+    {
+        for (size_t i = 0; i < secretWord.length(); ++i) 
+        {
+            if (secretWord[i] == guess) 
+            {
+                guessedWord[i] = guess;
+            }
+        }
+    }
 };
 
 int main() 
 {
-    // Variables
-    int num1 ;
-    int num2 ;
-    int result;
-
-    cout << "Enter a number: ";
-    cin >> num1;
-    cout << "Enter another number: ";
-    cin >> num2;
-
-    // Expressions
-    result = num1 + num2;
-
-    // Conditionals
-    if (result > 10) 
+    std::ifstream file("C:/Users/ACER/Desktop/Codes/C++ Sftw/words.txt");
+    if (!file.is_open()) 
     {
-        cout << "Result is greater than 10." << endl;
-    } 
-    else 
-    {
-        cout << "Result is not greater than 10." << endl;
+        std::cerr << "Error opening file." << std::endl;
+        return 1;
     }
 
-    // Loops
-    int fac;
-    cout << "Enter how many number you want to Factorize: ";
-    cin >> fac;
-
-    for (int i = 1; i <= fac; ++i) 
+    std::list<std::string> words;
+    std::string word;
+    while (file >> word) 
     {
-        cout << "Factorial of " << i << " is: " << factorial(i) << endl;
+        words.push_back(word);
+    }
+    file.close();
+
+    if (words.empty()) 
+    {
+        std::cerr << "No words found in file." << std::endl;
+        return 1;
     }
 
-    // Functions
-    int factorialOf3 = factorial(3);
-    cout << "Factorial of 3 is: " << factorialOf3 << endl;
+    srand(time(nullptr));
+    int randomIndex = rand() % words.size();
+    auto it = std::next(words.begin(), randomIndex);
+    std::string secretWord = *it;
 
-    // Classes
-    string fName;
-    int sAge;
-    cout << "Enter the name of a student: ";
-    cin >> fName;
-    cout << "Enter the age of the student: ";
-    cin >> sAge;
-
-    Student s1(fName, sAge);
-    Student s2("John", 20);
-    Student s3("Mary", 30);
-    s1.display();
-    s2.display();
-    s3.display();
-
-    // Data structure from STL
-    list<int> myList;
-    myList.push_back(1);
-    myList.push_back(2);
-    myList.push_back(3);
-
-    cout << "Contents of list:" << endl;
-    for (int item : myList) 
-    {
-        cout << item << " ";
-    }
-    cout << endl;
+    HangmanGame game(secretWord, 6);
+    game.play();
 
     return 0;
 }
