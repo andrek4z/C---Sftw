@@ -8,7 +8,7 @@ I create this software to create a funny game.
 
 You can wacth a demo of my software on the link below.
 
-[Basic Software in C++](https://www.youtube.com/watch?v=Ugouaf5EZQw)
+[Hangman Game in C++](https://www.youtube.com/watch?v=5GAAT3LqB-0)
 
 # Development Environment
 
